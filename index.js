@@ -39,6 +39,30 @@ async function run() {
         const bookingCollection = client.db('mobileBikroy').collection('booking');
 
 
+        // const verifyAdmin = async(req, res, next) => {
+        //     console.log('inside verify', req.decoded.email)
+        //     const decodedEmail = req.decoded.email;
+        //     const query = { email: decodedEmail };
+        //     const user = await userCollection.findOne(query);
+      
+        //     if (user?.role !== 'admin') {
+        //       return res.status(403).send({ message: 'forbidden access' })
+        //     }
+        //     next();
+        //   }
+
+        app.get('/jwt', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+            const user = await userCollection.findOne(query)
+            if (user) {
+              const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, { expiresIn: '1hr' })
+              return res.send({ accessToken: token })
+            }
+            res.status(403).send({ accessToken: ' ' })
+          })
+
+
         app.get('/categories', async (req, res) => {
             const query = {}
             const result = await categoryCollection.find(query).toArray()
